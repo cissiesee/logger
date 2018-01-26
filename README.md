@@ -31,13 +31,13 @@
 
 ## 版本说明
 ### 1.0.1
-1.更新lk-http-request组件
-1.更正readme
-1.增加host等配置功能
+1. 更新lk-http-request组件
+1. 更正readme
+1. 增加host等配置功能
 
 ### 1.0.2
-1.增加es5入口，for webpack
+1. 增加es5入口，for webpack
 
 ### 1.0.3
-1.更新lk-http-request至1.0.3
-1.补充说明文档
+1. 更新lk-http-request至1.0.3
+1. 补充说明文档
