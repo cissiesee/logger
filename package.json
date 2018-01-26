@@ -1,0 +1,41 @@
+{
+  "name": "lk-log",
+  "version": "1.0.2",
+  "description": "npm package description",
+  "main": "dist/lib.min.js",
+  "scripts": {
+    "es5": "tsc && babel src -d lib",
+    "build": "webpack --config=./config/webpack.prod.babel.js",
+    "build-ie8": "webpack --config=./config/webpack.prod-ie8.babel.js",
+    "dev": "webpack --config=./config/webpack.dev.babel.js --progress --colors --watch",
+    "test": "mocha --timeout 30000 --compilers js:babel-core/register --require ./test/setup.js ./test/*.spec.js"
+  },
+  "author": "huangzt",
+  "license": "MIT",
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "lk-http-request": "^1.0.3"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.4.1",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.1.2",
+    "es5-shim": "^4.5.9",
+    "mocha": "^3.5.3",
+    "tslint": "^5.7.0",
+    "typedoc": "^0.8.0",
+    "typedoc-webpack-plugin": "^1.1.4",
+    "typescript": "^2.5.2",
+    "webpack": "^3.5.6",
+    "webpack-merge": "^4.1.0"
+  },
+  "typescript": {
+    "definition": "dist/lib.d.ts"
+  },
+  "typings": "dist/lib.d.ts"
+}

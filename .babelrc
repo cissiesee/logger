@@ -1,0 +1,19 @@
+{
+    "presets": [
+        [
+            "env",
+            {
+                "browsers": [
+                    "last 2 Chrome versions",
+                    "ie >= 8",
+                    "Firefox >= 20",
+                    "iOS 7",
+                    "> 5%"
+                ]
+            }
+        ]
+    ],
+    "plugins": [
+        "transform-runtime"
+    ]
+}
