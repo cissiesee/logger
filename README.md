@@ -4,7 +4,7 @@
 ### 使用
     import lkLog from "lk-log";
     const logger = lkLog.getLogger("file name");
-    logger.config({
+    lkLog.config({
         //host: "",
         //logUrl: "project log url",
         //logLevel: 1 //close:0, primary:1, major:2, normal:3, minor:4
@@ -41,3 +41,12 @@
 ### 1.0.3
 1. 更新lk-http-request至1.0.3
 1. 补充说明文档
+1. 增加request log catch error
+
+### 1.0.4
+1. 打logger方法返回为promise
+1. 输出logs->log，从数组改为object
+1. 增加全局配置参数id，代表该客户端的id
+
+### 1.0.5
+1. loglevel从sessionstorage获取

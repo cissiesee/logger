@@ -26,17 +26,13 @@ function getShowLogLevel() {
         if (defaultOpts.logLevel !== -1) {
             resolve(defaultOpts.logLevel);
         } else {
-            lk_http_request_1.default(defaultOpts.host + "./resource/symbols/getProperty", {
-                type: "post",
-                data: {
-                    key: "eagle.app.loglevel"
-                }
-            }).then(function (level) {
+            var level = sessionStorage.getItem("loglevel");
+            if (level) {
                 defaultOpts.logLevel = parseInt(level, 10);
                 resolve(defaultOpts.logLevel);
-            }, function () {
+            } else {
                 reject();
-            });
+            }
         }
     });
 }
@@ -54,19 +50,17 @@ function _getLogData(data) {
             var defaults = {
                 level: data.level,
                 time: new Date().getTime(),
-                custname: sessionStorage.getItem("custname"),
                 fundid: sessionStorage.getItem("fundid")
             };
-            var contents = (Array.isArray(data) ? data : [data]).map(function (item) {
-                var newItem = (0, _assign2.default)({}, defaults, item);
-                return {
-                    level: newItem.level,
-                    info: "client time: " + newItem.time + ", fileName: " + newItem.fileName + ", custname: " + newItem.custname + ", fundid: " + newItem.fundid + ", info: " + newItem.info
-                };
-            });
+            var newItem = (0, _assign2.default)({}, defaults, data);
+            var content = {
+                level: newItem.level,
+                id: defaultOpts.id,
+                info: "client time: " + newItem.time + ", fileName: " + newItem.fileName + ", fundid: " + newItem.fundid + ", info: " + newItem.info
+            };
             resolve({
                 requestLog: isRequestLog,
-                logs: contents
+                log: content
             });
         }, function () {
             reject();
@@ -74,14 +68,20 @@ function _getLogData(data) {
     });
 }
 function requestLog(data) {
-    _getLogData(data).then(function (sendData) {
-        if (!sendData.requestLog) {
-            console.log("log:", sendData.logs);
-            return;
-        }
-        lk_http_request_1.default(defaultOpts.host + defaultOpts.logUrl, {
-            type: "post",
-            data: { logs: sendData.logs }
+    return new _promise2.default(function (resolve, reject) {
+        _getLogData(data).then(function (sendData) {
+            if (!sendData.requestLog) {
+                console.log("log:", sendData.log);
+                return;
+            }
+            lk_http_request_1.default(defaultOpts.host + defaultOpts.logUrl, {
+                type: "post",
+                data: { log: sendData.log }
+            }).then(function () {
+                resolve();
+            }).catch(function (err) {
+                reject(err);
+            });
         });
     });
 }
@@ -99,28 +99,28 @@ exports.default = {
                 });
             },
             primary: function primary(info) {
-                requestLog({
+                return requestLog({
                     level: "primary",
                     fileName: fileName,
                     info: info
                 });
             },
             major: function major(info) {
-                requestLog({
+                return requestLog({
                     level: "major",
                     fileName: fileName,
                     info: info
                 });
             },
             normal: function normal(info) {
-                requestLog({
+                return requestLog({
                     level: "normal",
                     fileName: fileName,
                     info: info
                 });
             },
             minor: function minor(info) {
-                requestLog({
+                return requestLog({
                     level: "minor",
                     fileName: fileName,
                     info: info

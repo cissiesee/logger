@@ -10,6 +10,7 @@ interface ILogConfig {
     logUrl: string;
     logLevel: number;
     host: string;
+    id?: string;
 }
 const defaultOpts: ILogConfig = {
     logUrl: "./command/hall/log/print",
@@ -32,23 +33,19 @@ function getShowLogLevel(): Promise<number> {
         if (defaultOpts.logLevel !== -1) {
             resolve(defaultOpts.logLevel);
         } else {
-            httpRequest(defaultOpts.host + "./resource/symbols/getProperty", {
-                type: "post",
-                data: {
-                    key: "eagle.app.loglevel"
-                }
-            }).then((level: string) => {
+            const level = sessionStorage.getItem("loglevel");
+            if (level) {
                 defaultOpts.logLevel = parseInt(level, 10);
                 resolve(defaultOpts.logLevel);
-            }, () => {
+            } else {
                 reject();
-            });
+            }
         }
     });
 }
 
 interface ILogDataReq { level: string; fileName: string; info: string; }
-interface ILogDataRes { requestLog: boolean; logs: any[]; }
+interface ILogDataRes { requestLog: boolean; log: any; }
 
 /**
  * 获取日志内容
@@ -62,19 +59,17 @@ function getLogData(data: ILogDataReq): Promise<ILogDataRes> {
             const defaults = {
                 level: data.level,
                 time: (new Date()).getTime(),
-                custname: sessionStorage.getItem("custname"),
                 fundid: sessionStorage.getItem("fundid")
             };
-            const contents = (Array.isArray(data) ? data : [data]).map((item) => {
-                const newItem = Object.assign({}, defaults, item);
-                return {
-                    level: newItem.level,
-                    info: `client time: ${newItem.time}, fileName: ${newItem.fileName}, custname: ${newItem.custname}, fundid: ${newItem.fundid}, info: ${newItem.info}`
-                };
-            });
+            const newItem = Object.assign({}, defaults, data);
+            const content = {
+                level: newItem.level,
+                id: defaultOpts.id,
+                info: `client time: ${newItem.time}, fileName: ${newItem.fileName}, fundid: ${newItem.fundid}, info: ${newItem.info}`
+            };
             resolve({
                 requestLog: isRequestLog,
-                logs: contents
+                log: content
             });
         }, () => {
             reject();
@@ -83,14 +78,22 @@ function getLogData(data: ILogDataReq): Promise<ILogDataRes> {
 }
 
 function requestLog(data: ILogDataReq) {
-    getLogData(data).then((sendData) => {
-        if (!sendData.requestLog) {
-            console.log("log:", sendData.logs);
-            return;
-        }
-        httpRequest(defaultOpts.host + defaultOpts.logUrl, {
-            type: "post",
-            data: { logs: sendData.logs }
+    return new Promise((resolve, reject) => {
+        getLogData(data).then((sendData) => {
+            if (!sendData.requestLog) {
+                console.log("log:", sendData.log);
+                return;
+            }
+            httpRequest(defaultOpts.host + defaultOpts.logUrl, {
+                type: "post",
+                data: { log: sendData.log }
+            })
+                .then(() => {
+                    resolve();
+                })
+                .catch((err: any) => {
+                    reject(err);
+                });
         });
     });
 }
@@ -109,28 +112,28 @@ export default {
                 });
             },
             primary(info: string) {
-                requestLog({
+                return requestLog({
                     level: "primary",
                     fileName,
                     info
                 });
             },
             major(info: string) {
-                requestLog({
+                return requestLog({
                     level: "major",
                     fileName,
                     info
                 });
             },
             normal(info: string) {
-                requestLog({
+                return requestLog({
                     level: "normal",
                     fileName,
                     info
                 });
             },
             minor(info: string) {
-                requestLog({
+                return requestLog({
                     level: "minor",
                     fileName,
                     info

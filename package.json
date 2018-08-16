@@ -1,10 +1,10 @@
 {
   "name": "lk-log",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "npm package description",
-  "main": "dist/lib.min.js",
+  "main": "es/index.js",
   "scripts": {
-    "es5": "tsc && babel src -d lib",
+    "es5": "tsc --outDir compile && babel compile -d es",
     "build": "webpack --config=./config/webpack.prod.babel.js",
     "build-ie8": "webpack --config=./config/webpack.prod-ie8.babel.js",
     "dev": "webpack --config=./config/webpack.dev.babel.js --progress --colors --watch",

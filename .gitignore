@@ -1,10 +1,10 @@
-package-lock.json
 # dependencies
 node_modules
 
 # compiled output
 build
 release
+compile
 
 # IDE - VSCode
 .vscode/*
