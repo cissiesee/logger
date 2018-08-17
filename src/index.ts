@@ -53,20 +53,20 @@ interface ILogDataRes { requestLog: boolean; log: any; }
  */
 function getLogData(data: ILogDataReq): Promise<ILogDataRes> {
     return new Promise((resolve, reject) => {
+        const levelInfo = levelMap.find(item => item.text === data.level);
+        const defaults = {
+            level: data.level,
+            time: (new Date()).getTime(),
+            fundid: sessionStorage.getItem("fundid")
+        };
+        const newItem = Object.assign({}, defaults, data);
+        const content = {
+            level: newItem.level,
+            id: defaultOpts.id,
+            info: `client time: ${newItem.time}, fileName: ${newItem.fileName}, fundid: ${newItem.fundid}, info: ${newItem.info}`
+        };
         getShowLogLevel().then((showLevel: number) => {
-            const levelInfo = levelMap.find(item => item.text === data.level);
             const isRequestLog = levelInfo.code > showLevel ? false : true;
-            const defaults = {
-                level: data.level,
-                time: (new Date()).getTime(),
-                fundid: sessionStorage.getItem("fundid")
-            };
-            const newItem = Object.assign({}, defaults, data);
-            const content = {
-                level: newItem.level,
-                id: defaultOpts.id,
-                info: `client time: ${newItem.time}, fileName: ${newItem.fileName}, fundid: ${newItem.fundid}, info: ${newItem.info}`
-            };
             resolve({
                 requestLog: isRequestLog,
                 log: content
@@ -94,6 +94,8 @@ function requestLog(data: ILogDataReq) {
                 .catch((err: any) => {
                     reject(err);
                 });
+        }, () => {
+            console.log("get loglevel fail");
         });
     });
 }
